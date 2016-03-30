@@ -1,0 +1,68 @@
+#!/bin/bash
+
+BASE=$(dirname $(readlink -f $0))/..
+
+set -a
+. $BASE/lib/functions
+. $BASE/etc/config
+set +a
+
+start()
+{
+	PID=`cat $PIDFILE`
+	STATUS=`ps -fp $PID >/dev/null 2>&1 | grep 'auotvpn.sh' | grep -v grep | wc -l`
+	if [[ "$STATUS" -gt 0 ]]; then
+		echo "Auto VPN already running"
+	else
+		nohup $BASE/bin/autovpn.sh >> $LOGFILE 2>&1 &
+		echo "$`ps -fe | grep autovpn.sh | grep -v grep | awk '{print $2}'`" > $PIDFILE
+	fi
+}
+
+stop()
+{
+	STATUS=`ps -fe >/dev/null 2>&1 | grep 'auotvpn.sh' | grep -v grep | wc -l`
+	if [[ "$STATUS" == 0 ]]; then
+		echo "Auto VPN not running"
+	else
+		PID=`cat $PIDFILE`
+		kill $PID
+		rm $PIDFILE
+	fi	
+}
+
+status()
+{
+	if [[ -f $PIDFILE ]]; then
+		PID=`cat $PIDFILE`
+		if [[ "$`ps -fp $PID | wc -l`" == 1 ]]; then
+			echo "AutoVPN running with pid: $PID"
+		else
+			echo "There appear to be more than 1 instance of AutoVPN running"
+		fi
+	else
+		echo "AutoVPN doesn't appear to be running"
+	fi
+}
+
+### main logic ###
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  status)
+        status
+        ;;
+  restart|reload|condrestart)
+        stop
+	sleep 1
+        start
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart|reload|status}"
+        exit 1
+esac
+exit 0
