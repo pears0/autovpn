@@ -1,5 +1,12 @@
 #!/bin/bash
 
+BASE=$(dirname $(readlink -f $0))/..
+
+set -a
+. $BASE/lib/functions
+. $BASE/etc/config
+set +a
+
 if [[ $`home_status` = 0 ]]; then
 	if [[ -f '$home_password_file' ]]; then
 		if [[ -f '$home_config_file' ]]; then

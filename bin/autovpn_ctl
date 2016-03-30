@@ -12,7 +12,7 @@ start()
 	PID=`cat $PIDFILE`
 	STATUS=`ps -fp $PID >/dev/null 2>&1 | grep 'auotvpn.sh' | grep -v grep | wc -l`
 	if [[ "$STATUS" -gt 0 ]]; then
-		echo "Auto VPN already running"
+		echo "AutoVPN already running"
 	else
 		nohup $BASE/bin/autovpn.sh >> $LOGFILE 2>&1 &
 		echo "$`ps -fe | grep autovpn.sh | grep -v grep | awk '{print $2}'`" > $PIDFILE
@@ -23,7 +23,7 @@ stop()
 {
 	STATUS=`ps -fe >/dev/null 2>&1 | grep 'auotvpn.sh' | grep -v grep | wc -l`
 	if [[ "$STATUS" == 0 ]]; then
-		echo "Auto VPN not running"
+		echo "AutoVPN is not running"
 	else
 		PID=`cat $PIDFILE`
 		kill $PID

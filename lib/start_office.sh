@@ -1,5 +1,12 @@
 #!/bin/bash
 
+BASE=$(dirname $(readlink -f $0))/..
+
+set -a
+. $BASE/lib/functions
+. $BASE/etc/config
+set +a
+
 if [[ $`office_status` = 0 ]]; then
 	if [[ -f '$office_password_file' ]]; then
 		if [[ -f '$office_config_file' ]]; then
