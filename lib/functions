@@ -1,0 +1,93 @@
+#!/bin/bash
+
+start_office()
+{
+	if [[ $`office_status` = 0 ]]; then
+		if [[ -f '$office_password_file' ]]; then
+			if [[ -f '$office_config_file' ]]; then
+				log "Starting office connection"
+				systemctl start openvpn@office.service
+			else
+				log "Office connection config file not found"
+			fi
+		else
+			log "Office connection auth file not found"
+		fi
+	else
+		log "Connection is already running, check link status"
+	fi
+}
+
+start_home()
+{
+	if [[ $`home_status` = 0 ]]; then
+		if [[ -f '$home_password_file' ]]; then
+			if [[ -f '$home_config_file' ]]; then
+				log "Starting home connection"
+				systemctl start openvpn@home.service
+			else
+				log "Home connection config file not found"
+			fi
+		else
+			log "Office connection auth file not found"
+		fi	
+	else
+		log "Conection is already running, check link status"
+	fi
+		
+
+}
+
+
+stop_office()
+{
+	if [[ $`office_status` = 1 ]]; then
+		log "Stopping office connection"
+		systemctl stop openvpn@office.service
+	else
+		log "Office connection is already down"
+	fi
+	
+}
+
+stop_home()
+{
+	if [[ $`home_status` = 1 ]]; then
+		log "Stopping home connection"
+		systemctl stop openvpn@home.service
+	else
+		log "Home connection is already down"
+	fi
+	
+}
+
+office_status()
+{
+	active=`systemctl status openvpn@office.service | grep 'Active:' | awk '{print $2}'`
+	if [[ $active -s 'active' ]]; then
+		echo 1
+	else
+		echo 0
+	fi
+}
+
+home_status()
+{
+	active=`systemctl status openvpn@home.service | grep 'Active:' | awk '{print $2}'`
+	if [[ $active -s 'active' ]]; then
+		echo 1
+	else
+		echo 0
+	fi
+}
+
+log()
+{
+	NOW=$(date +"%Y-%m-%d %T")
+	echo "$NOW: $*" >>$LOGFILE
+}
+
+test_network_connection()
+{
+	
+}
