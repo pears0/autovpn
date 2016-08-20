@@ -11,7 +11,7 @@ if [[ $`office_status` = 0 ]]; then
 	if [[ -f '$office_password_file' ]]; then
 		if [[ -f '$office_config_file' ]]; then
 			log "Starting office connection"
-			systemctl start openvpn@office.service
+			nmcli con up id office
 		else
 			log "Office connection config file not found"
 		fi

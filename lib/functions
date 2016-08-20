@@ -3,8 +3,8 @@ PIDFILE=$BASE/log/pid
 
 office_status()
 {
-	active=`systemctl status openvpn@office.service | grep 'Active:' | awk '{print $2}'`
-	if [[ "$active" == "active" ]]; then
+	active=`ps -fe | grep '/usr/sbin/openvpn.*office.i-neda.com' | grep -v grep | wc -l`
+	if [[ "$active" -gt 0 ]]; then
 		echo 1
 	else
 		echo 0
@@ -13,8 +13,8 @@ office_status()
 
 home_status()
 {
-	active=`systemctl status openvpn@home.service | grep 'Active:' | awk '{print $2}'`
-	if [[ "$active" == "active" ]]; then
+	active=`ps -fe | grep '/usr/sbin/openvpn.*g0nz0.me.uk' | grep -v grep | wc -l`
+	if [[ "$active" -gt 1 ]]; then
 		echo 1
 	else
 		echo 0
@@ -55,8 +55,8 @@ home_network_test()
 	EXTERNAL_IP=`curl www.i-neda.com/ip.php 2>/dev/null | awk '{print $1}'`
 	ip addr show dev wlp2s0 | grep 'inet ' | awk '{print $2}' | sed 's/\./ /g' | sed 's/\// /' | awk '{print $1" "$2" "$3" "$5}' | while read IP1 IP2 IP3 NETWORK; do
 		PARSE_NETWORK=`echo "$IP1 $IP2 $IP3 $NETWORK"`
-		if [[ $PARSE_NETWORK -eq '10 192 53 24' ]]; then
-			if [[ $ADMIN_IP -eq '10.192.53.190' ]]; then
+		if [[ $PARSE_NETWORK -eq '10 23 1 24' ]]; then
+			if [[ $ADMIN_IP -eq '10.23.1.190' ]]; then
 				if [[ $HOME_IP -eq $EXTERNAL_IP ]]; then
 					log "On the home network"
 					echo "1"

@@ -11,7 +11,7 @@ if [[ $`home_status` = 0 ]]; then
 	if [[ -f '$home_password_file' ]]; then
 		if [[ -f '$home_config_file' ]]; then
 			log "Starting home connection"
-			systemctl start openvpn@home.service
+			nmcli con up id home
 		else
 			log "Home connection config file not found"
 		fi

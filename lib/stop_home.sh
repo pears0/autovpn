@@ -9,7 +9,7 @@ set +a
 
 if [[ $`home_status` = 1 ]]; then
 	log "Stopping home connection"
-	systemctl stop openvpn@home.service
+	nmcli con down id home
 else
 	log "Home connection is already down"
 fi
