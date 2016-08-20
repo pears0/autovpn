@@ -15,18 +15,18 @@ start()
 		echo "AutoVPN already running"
 	else
 		nohup $BASE/bin/autovpn.sh >> $LOGFILE 2>&1 &
-		echo "$`ps -fe | grep autovpn.sh | grep -v grep | awk '{print $2}'`" > $PIDFILE
+		echo "`ps -fe | grep autovpn.sh | grep -v grep | awk '{print $2}'`" > $PIDFILE
 	fi
 }
 
 stop()
 {
-	STATUS=`ps -fe >/dev/null 2>&1 | grep 'auotvpn.sh' | grep -v grep | wc -l`
+	STATUS=`ps -fe 2>/dev/null | grep autovpn.sh | grep -v grep | wc -l`
 	if [[ "$STATUS" == 0 ]]; then
 		echo "AutoVPN is not running"
 	else
 		PID=`cat $PIDFILE`
-		kill $PID
+		kill -9 $PID
 		rm $PIDFILE
 	fi	
 }
@@ -35,7 +35,7 @@ status()
 {
 	if [[ -f $PIDFILE ]]; then
 		PID=`cat $PIDFILE`
-		if [[ "$`ps -fp $PID | wc -l`" == 1 ]]; then
+		if [[ "`ps -fp $PID | grep -v UID | wc -l`" == 1 ]]; then
 			echo "AutoVPN running with pid: $PID"
 		else
 			echo "There appear to be more than 1 instance of AutoVPN running"

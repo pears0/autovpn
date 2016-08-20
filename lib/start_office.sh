@@ -7,17 +7,9 @@ set -a
 . $BASE/etc/config
 set +a
 
-if [[ $`office_status` = 0 ]]; then
-	if [[ -f '$office_password_file' ]]; then
-		if [[ -f '$office_config_file' ]]; then
-			log "Starting office connection"
-			nmcli con up id office
-		else
-			log "Office connection config file not found"
-		fi
-	else
-		log "Office connection auth file not found"
-	fi
+if [[ `office_status` = 0 ]]; then
+	log "Starting office connection"
+	nmcli con up id office >>$LOGFILE 2>%1
 else
-	log "Connection is already running, check link status"
+	log "Office connection already up"
 fi

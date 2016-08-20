@@ -4,7 +4,7 @@ PIDFILE=$BASE/log/pid
 office_status()
 {
 	active=`ps -fe | grep '/usr/sbin/openvpn.*office.i-neda.com' | grep -v grep | wc -l`
-	if [[ "$active" -gt 0 ]]; then
+	if [[ $active -gt 0 ]]; then
 		echo 1
 	else
 		echo 0
@@ -14,7 +14,7 @@ office_status()
 home_status()
 {
 	active=`ps -fe | grep '/usr/sbin/openvpn.*g0nz0.me.uk' | grep -v grep | wc -l`
-	if [[ "$active" -gt 1 ]]; then
+	if [[ $active -gt 1 ]]; then
 		echo 1
 	else
 		echo 0
@@ -29,35 +29,35 @@ log()
 
 start_home()
 {
-	sudo $BASE/lib/start_home.sh
+	$BASE/lib/start_home.sh
 }
 
 stop_home()
 {
-	sudo $BASE/lib/stop_home.sh
+	$BASE/lib/stop_home.sh
 }
 
 start_office()
 {
-	sudo $BASE/lib/start_office.sh
+	$BASE/lib/start_office.sh
 }
 
 stop_office()
 {
-	sudo $BASE/lib/stop_office.sh
+	$BASE/lib/stop_office.sh
 }
 
 home_network_test()
 {
 	NIC=`ip addr | grep ' UP ' | awk '{print $2}' | sed 's/\://'`
-	ADMIN_IP=`host admin | awk '{print $4}'`
+	ADMIN_IP=`host admin.g0nz0.me.uk 10.23.1.252 | awk '{print $4}'`
 	HOME_IP=`host g0nz0.me.uk | awk '{print $4}'`
 	EXTERNAL_IP=`curl www.i-neda.com/ip.php 2>/dev/null | awk '{print $1}'`
-	ip addr show dev wlp2s0 | grep 'inet ' | awk '{print $2}' | sed 's/\./ /g' | sed 's/\// /' | awk '{print $1" "$2" "$3" "$5}' | while read IP1 IP2 IP3 NETWORK; do
+	ip addr show dev wlp2s0 | grep 'inet ' | grep -v link | grep -v '/n' | awk '{print $2}' | sed 's/\./ /g' | sed 's|/| |' | awk '{print $1" "$2" "$3" "$5}' | while read IP1 IP2 IP3 NETWORK; do
 		PARSE_NETWORK=`echo "$IP1 $IP2 $IP3 $NETWORK"`
-		if [[ $PARSE_NETWORK -eq '10 23 1 24' ]]; then
-			if [[ $ADMIN_IP -eq '10.23.1.190' ]]; then
-				if [[ $HOME_IP -eq $EXTERNAL_IP ]]; then
+		if [[ $PARSE_NETWORK == '10 23 1 24' ]]; then
+			if [[ $ADMIN_IP == '10.23.1.190' ]]; then
+				if [[ $HOME_IP == $EXTERNAL_IP ]]; then
 					log "On the home network"
 					echo "1"
 				fi
@@ -72,20 +72,20 @@ home_network_test()
 office_network_test()
 {
 	NIC=`ip addr | grep ' UP ' | awk '{print $2}' | sed 's/\://'`
-	TC01_IP=`host tc01 | awk '{print $4}'`
+	TC01_IP=`host tc01.office.i-neda.com 192.168.0.252 | awk '{print $4}'`
 	OFFICE_IP=`host office.i-neda.com | awk '{print $4}'`
 	EXTERNAL_IP=`curl www.i-neda.com/ip.php 2>/dev/null | awk '{print $1}'`
-	ip addr show dev wlp2s0 | grep 'inet ' | awk '{print $2}' | sed 's/\./ /g' | sed 's/\// /' | awk '{print $1" "$2" "$3" "$5}' | while read IP1 IP2 IP3 NETWORK; do
+	ip addr show dev wlp2s0 | grep 'inet ' | grep -v link | grep -v '/n' | awk '{print $2}' | sed 's/\./ /g' | sed 's|/| |' | awk '{print $1" "$2" "$3" "$5}' | while read IP1 IP2 IP3 NETWORK; do
 		PARSE_NETWORK=`echo "$IP1 $IP2 $IP3 $NETWORK"`
-		if [[ $PARSE_NETWORK -eq '192 198 0 24' ]]; then
-			if [[ $TC01_IP -eq '192.168.0.' ]]; then
-				if [[ $OFFICE_IP -eq $EXTERNAL_IP ]]; then
-					log "On the home network"
+		if [[ $PARSE_NETWORK == '192 198 0 24' ]]; then
+			if [[ $TC01_IP == '192.168.0.' ]]; then
+				if [[ $OFFICE_IP == $EXTERNAL_IP ]]; then
+					log "On the office network"
 					echo "1"
 				fi
 			fi
 		else
-			log "Not on the home network"
+			log "Not on the office network"
 			echo "0"
 		fi
 	done
